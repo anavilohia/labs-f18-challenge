@@ -3,7 +3,6 @@ import requests
 
 app = Flask(__name__)
 
-
 @app.route('/', methods=['GET'])
 def main():
   return render_template('index.html')
@@ -11,7 +10,7 @@ def main():
 @app.route('/pokemon/<int:idInput>')
 def printName(idInput):
   id,name = pokeRequest(idInput)
-  outputString = 'The Pokemon with id %d is ' % idInput + name
+  outputString = 'The pokemon with id %d is ' % idInput + name
   return createHTML(outputString)
 
 @app.route('/pokemon/<nameInput>')
@@ -22,12 +21,16 @@ def printID(nameInput):
 
 def pokeRequest(query):
   r = requests.get('http://pokeapi.co/api/v2/pokemon/' + str(query))
-  responseDict = r.json()['forms'][0]
-  url=responseDict['url']
-  base = 'https://pokeapi.co/api/v2/pokemon-form/'
-  id = str(url.split(start)[1][0:-1])
-  name = responseDict['name']
-  return id,name
+
+  if (r.status_code == 200):
+    responseDict = r.json()['forms'][0]
+    url=responseDict['url']
+    base = 'https://pokeapi.co/api/v2/pokemon-form/'
+    id = str(url.split(base)[1][0:-1])
+    name = responseDict['name']
+    return id,name
+
+  return 'invalid','invalid'
 
 def createHTML(outputString):
     page = """<html>
